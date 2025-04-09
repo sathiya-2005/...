@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>.</title>
+</head>
+<body>
+  <h1></h1>
+  <div>
+    <button onclick="copyCode(0)">1</button>
+    <button onclick="copyCode(1)">2</button>
+    <button onclick="copyCode(2)">3</button>
+    <button onclick="copyCode(3)">4</button>
+    <button onclick="copyCode(4)">5</button>
+    <button onclick="copyCode(5)">6</button>
+    <button onclick="copyCode(6)">7</button>
+    <button onclick="copyCode(7)">8</button>
+    <button onclick="copyCode(8)">9</button>
+    <button onclick="copyCode(9)">10</button>
+  </div>
+
+  <script>
+    const codes = [
+`const int led = 8, trig = 9, echo = 10;
+void setup() {
+  pinMode(trig, OUTPUT);
+  pinMode(echo, INPUT);
+  pinMode(led, OUTPUT);
+  Serial.begin(9600);
+}
+void loop() {
+  digitalWrite(trig, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trig, LOW);
+  float duration = pulseIn(echo, HIGH);
+  float distance = duration * 0.017;
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.print("cm | ");
+  Serial.print(distance / 2.54);
+  Serial.println("in");
+  digitalWrite(led, distance <= 50 ? HIGH : LOW);
+  delay(100);
+}`,
+
+`#include <Servo.h>
+Servo servo;
+int angles[] = {0, 90, 180};
+void setup() {
+  Serial.begin(9600);
+  servo.attach(9);
+}
+void loop() {
+  for (int i = 0; i < 3; i++) {
+    servo.write(angles[i]);
+    Serial.print("Moving to ");
+    Serial.print(angles[i]);
+    Serial.println(" degrees");
+    delay(1000);
+  }
+}`,
+
+`#include <dht.h>
+#define DHT_TYPE DHT11
+#define DHTPIN 7
+dht DHT;
+void setup() {
+  Serial.begin(9600);
+}
+void loop() {
+  DHT.read11(DHTPIN);
+  float t = DHT.temperature;
+  float h = DHT.humidity;
+  Serial.print("Temperature: ");
+  Serial.print(t * 9.0 / 5.0 + 32.0);
+  Serial.println(" F");
+  Serial.print("Humidity: ");
+  Serial.print(h);
+  Serial.println(" %\n");
+  delay(2000);
+}`,
+
+`#include <Stepper.h>
+const int stepsPerRevolution = 200;
+const int rpm = 60;
+Stepper myStepper(stepsPerRevolution, 8, 9, 10, 11);
+void setup() {
+  myStepper.setSpeed(rpm);
+  Serial.begin(9600);
+}
+void loop() {
+  Serial.println("Moving clockwise");
+  myStepper.step(stepsPerRevolution);
+  Serial.print("Angle moved: ");
+  Serial.println(360);
+  Serial.print("RPM: ");
+  Serial.println(rpm);
+  delay(500);
+  Serial.println("Moving counterclockwise");
+  myStepper.step(-stepsPerRevolution);
+  Serial.print("Angle moved: ");
+  Serial.println(360);
+  Serial.print("RPM: ");
+  Serial.println(rpm);
+  delay(500);
+}`,
+
+`const int moisturePin = A0;
+void setup() {
+  Serial.begin(9600);
+}
+void loop() {
+  int moistureValue = analogRead(moisturePin);
+  Serial.print("Soil Moisture Level: ");
+  Serial.println(moistureValue);
+  delay(1000);
+}`,
+
+`void setup() {
+  pinMode(A1, INPUT);
+  pinMode(7, OUTPUT);
+  Serial.begin(9600);
+}
+void loop() {
+  float voltage = analogRead(A1) * 0.00488;
+  digitalWrite(7, voltage > 3.3 ? HIGH : LOW);
+  Serial.println(voltage);
+  delay(10);
+}`,
+
+`const int ldr_pin = A0;
+const int led_pin = 8;
+const int threshold = 500;
+void setup() {
+  pinMode(led_pin, OUTPUT);
+  Serial.begin(9600);
+}
+void loop() {
+  int ldrValue = analogRead(ldr_pin);
+  digitalWrite(led_pin, ldrValue < threshold ? HIGH : LOW);
+  Serial.println(ldrValue);
+  delay(100);
+}`,
+
+`int vib_pin = 7;
+void setup() {
+  pinMode(vib_pin, INPUT);
+  Serial.begin(9600);
+}
+void loop() {
+  if (digitalRead(vib_pin))
+    Serial.println("It's vibrating");
+  else
+    Serial.println("Not vibrating");
+  delay(100);
+}`,
+
+`#include <Wire.h>
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
+Adafruit_MPU6050 mpu;
+void setup() {
+  Serial.begin(9600);
+  while (!Serial);
+  if (!mpu.begin()) {
+    Serial.println("MPU6050 not found");
+    while (1);
+  }
+  delay(100);
+  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
+  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+  mpu.setFilterBandwidth(MPU6050_BAND_5_HZ);
+}
+void loop() {
+  sensors_event_t accel, gyro, temp;
+  mpu.getEvent(&accel, &gyro, &temp);
+  Serial.print("Accel: ");
+  Serial.print(accel.acceleration.x); Serial.print(" ");
+  Serial.print(accel.acceleration.y); Serial.print(" ");
+  Serial.println(accel.acceleration.z);
+  Serial.print("Gyro: ");
+  Serial.print(gyro.gyro.x); Serial.print(" ");
+  Serial.print(gyro.gyro.y); Serial.print(" ");
+  Serial.println(gyro.gyro.z);
+  Serial.println();
+  delay(500);
+}`,
+
+`int in1=8;
+int in2=9;
+int ena=5;
+void setup(){
+ pinMode(in1,OUTPUT);
+ pinMode(in2,OUTPUT);
+ pinMode(ena,OUTPUT);
+ Serial.begin(9600);
+}
+void loop(){
+ digitalWrite(in1,HIGH);
+ digitalWrite(in2,LOW);
+ analogWrite(ena,255);
+ Serial.println("Forward - 168 RPM");
+ delay(178);
+ analogWrite(ena,0);
+ delay(1000);
+ digitalWrite(in1,LOW);
+ digitalWrite(in2,HIGH);
+ analogWrite(ena,128);
+ Serial.println("Reverse - 84 RPM");
+ delay(357);
+ analogWrite(ena,0);
+ delay(2000);
+}`
+    ];
+
+    function copyCode(index) {
+      navigator.clipboard.writeText(codes[index]).then(() => {
+        alert("Code " + (index + 1) + " copied to clipboard!");
+      });
+    }
+  </script>
+</body>
+</html>
